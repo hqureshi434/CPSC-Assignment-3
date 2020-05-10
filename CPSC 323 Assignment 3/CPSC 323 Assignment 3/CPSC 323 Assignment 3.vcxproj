@@ -126,10 +126,11 @@
     <Text Include="Input.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainTwo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Analysis.h" />
+    <ClInclude Include="SymbolGenerator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

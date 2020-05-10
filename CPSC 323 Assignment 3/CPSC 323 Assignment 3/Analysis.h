@@ -1,6 +1,6 @@
 // Omar Ramirez, Francisco Ramirez, and Hammad Qureshi
 // CPSC 323
-// Assignment 2
+// Assignment 3
 //Creating a Syntax Analyzer with the help of Lexical Analyzer.
 
 #include <fstream>
