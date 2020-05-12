@@ -10,6 +10,8 @@
 #include <cctype>
 #include <cstdlib>
 #include <string.h>
+#include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -55,11 +57,29 @@ private:
 
 	//For Syntax Analyzer
 	int stackindex = 0;
+	int lineNumber = 1;
 	char testChar = ' ';
-	char	stack[20] = " ";
+	char	theStack[20] = " ";
 	char testWord[20];
 	char testCharList[20];
 	bool status; //conditionSet
+
+	//For Symbol Table
+	int Memory_Address = 5000;
+	string prevType = "";
+	vector<string> idList, typesList;
+	vector<int> memoryList;
+	string lastID = "";
+	string prevVar = "", nextVar = "";
+	char lastOp;
+
+	string instructions[1000];
+	int instructionLine = 1;
+	stack <int> s;
+	string delay = "";
+	char equation[10][23];
+	int iteration = 0;
+	bool isEquation = false;
 
 public:
 	Analysis() {}; //Default Contructor
@@ -151,6 +171,106 @@ public:
 		file.close();
 	}
 
+	void error(string str)
+	{
+		//Clear output file
+		myfile.close();
+		myfile.open("Output.txt", ios::out | ios::trunc);
+		// Output error message
+		myfile << "Error: " << str << " at line: " << lineNumber;
+		exit(0);
+	}
+
+	//***********SYMBOL TABLE CODE**********************//
+	/*for instructions that require an input for
+	integer value or memory location*/
+	void assemble(string assemblyIns, int val) {
+		myfile << instructionLine;
+		if (assemblyIns == "PUSHI") {
+			myfile << "	PUSHI	";
+		}
+		else if (assemblyIns == "PUSHM") {
+			myfile << "	PUSHM	";
+		}
+		else if (assemblyIns == "POPM") {
+			myfile << "	POPM		";
+		}
+		else if (assemblyIns == "JUMPZ") {
+			myfile << "	JUMPZ	";
+		}
+		else if (assemblyIns == "JUMP") {
+			myfile << "	JUMP		";
+		}
+		else {
+			error("Assembly Instruction not valid");
+		}
+		instructionLine++;
+		myfile << val << endl;
+	}
+
+
+	//for instructions that require no input
+	void assemble(string assemblyIns) {
+		myfile << instructionLine;
+		if (assemblyIns == "STDOUT") {
+			myfile << "	STDOUT";
+		}
+		else if (assemblyIns == "STDIN") {
+			myfile << "	STDIN";
+		}
+		else if (assemblyIns == "ADD") {
+			myfile << "	ADD";
+		}
+		else if (assemblyIns == "SUB") {
+			myfile << "	SUB";
+		}
+		else if (assemblyIns == "MUL") {
+			myfile << "	MUL";
+		}
+		else if (assemblyIns == "DIV") {
+			myfile << "	DIV";
+		}
+		else if (assemblyIns == "GRT") {
+			myfile << "	GRT";
+		}
+		else if (assemblyIns == "LES") {
+			myfile << "	LES";
+		}
+		else if (assemblyIns == "EQU") {
+			myfile << "	EQU";
+		}
+		else if (assemblyIns == "NEQ") {
+			myfile << "	NEQ";
+		}
+		else if (assemblyIns == "GEQ") {
+			myfile << "	GEQ";
+		}
+		else if (assemblyIns == "LEQ") {
+			myfile << "	LEQ";
+		}
+		else if (assemblyIns == "LABEL") {
+			myfile << "	LABEL";
+		}
+		else {
+			error("Assembly Instruction not valid");
+		}
+		instructionLine++;
+		myfile << endl;
+	}
+
+	void symbolTable()
+	{
+		myfile << "\n\n\t\tSYMBOL TABLE\nIdentifier\tMemoryLocation\tType\n";
+
+		for (int i = 0; i < idList.size(); i++) {
+			myfile << idList.at(i) << "\t\t" << memoryList.at(i) << "\t\t" << typesList.at(i) << endl;
+		}
+		myfile << endl << endl;
+	}
+
+	//------------------------------------------------------------------------------------------------------------
+
+
 	//***********SYNTAX ANALYZER CODE**********************//
 	//Does a comparison with character to the keyword array to see if there is a keyword
 
@@ -199,9 +319,9 @@ public:
 
 		char openers[5] = { "([{'" }, closers[] = { ")]}'" }; //Contain the opening and closing separators in their own character arrays
 		for (int a = 0; a < 4; a++) { //Will iterate through all the elements in both arrays
-			if (testChar == openers[a] && stack[stackindex] != openers[a]) {//know testChar is a closing separator
+			if (testChar == openers[a] && theStack[stackindex] != openers[a]) {//know testChar is a closing separator
 				stackindex++;
-				stack[stackindex] = testChar;//add separator to the stack
+				theStack[stackindex] = testChar;//add separator to the stack
 
 				if (testChar == '(') {
 					phrase += " <Condition>\n";
@@ -214,9 +334,9 @@ public:
 				return phrase;
 			}
 			else if (testChar == closers[a]) {//know testChar is a closing separator
-				if (openers[a] == stack[stackindex]) {
+				if (openers[a] == theStack[stackindex]) {
 
-					stack[stackindex] = ' ';
+					theStack[stackindex] = ' ';
 					stackindex--;
 					if (testChar == ')') {
 						phrase += " <Condition>\n";

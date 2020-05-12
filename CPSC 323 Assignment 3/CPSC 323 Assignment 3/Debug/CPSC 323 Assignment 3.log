@@ -1,7 +1,1 @@
-﻿  mainTwo.cpp
-c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\symbolgenerator.h(114): warning C4018: '<': signed/unsigned mismatch
-c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\symbolgenerator.h(151): warning C4018: '<': signed/unsigned mismatch
-c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\symbolgenerator.h(250): warning C4018: '<': signed/unsigned mismatch
-c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\symbolgenerator.h(267): warning C4018: '<': signed/unsigned mismatch
-c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\symbolgenerator.h(271): warning C4715: 'getAddr': not all control paths return a value
-  CPSC 323 Assignment 3.vcxproj -> C:\Users\Hammad\Desktop\CPSC 323 Assignment 3 Stiff\CPSC-Assignment-3\CPSC 323 Assignment 3\Debug\CPSC 323 Assignment 3.exe
+﻿
