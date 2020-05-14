@@ -18,6 +18,9 @@
     <Text Include="Input.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="mainTwo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

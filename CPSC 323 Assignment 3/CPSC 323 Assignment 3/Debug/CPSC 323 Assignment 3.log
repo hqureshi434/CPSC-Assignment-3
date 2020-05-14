@@ -1,1 +1,6 @@
-﻿
+﻿  main.cpp
+c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\analysis.h(264): warning C4018: '<': signed/unsigned mismatch
+c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\analysis.h(302): warning C4018: '<': signed/unsigned mismatch
+c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\analysis.h(393): warning C4018: '<': signed/unsigned mismatch
+c:\users\hammad\desktop\cpsc 323 assignment 3 stiff\cpsc-assignment-3\cpsc 323 assignment 3\cpsc 323 assignment 3\analysis.h(408): warning C4018: '<': signed/unsigned mismatch
+  CPSC 323 Assignment 3.vcxproj -> C:\Users\Hammad\Desktop\CPSC 323 Assignment 3 Stiff\CPSC-Assignment-3\CPSC 323 Assignment 3\Debug\CPSC 323 Assignment 3.exe

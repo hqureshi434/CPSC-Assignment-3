@@ -12,6 +12,7 @@
 #include <string.h>
 #include <vector>
 #include <stack>
+#include <sstream>
 
 using namespace std;
 
@@ -139,8 +140,6 @@ public:
 						if(compareWord.compare("String") == 0) //If the lexer identifies a token as a String then use the separators function
 						{
 							fileWriter << Separators();
-
-
 						}
 						else if(compareWord.compare("Operator") == 0) //If the lexer identifies a token as an operator then use the oparators function
 						{
@@ -284,135 +283,173 @@ public:
 	}
 
 	string Identifiers() { //Identifiers - syntaxID
-		string a;
+		string str, filtered;
 		char operators[] = "+-*/%";
-		bool RHS = true; //rightHandSide
-		bool firstOfLHS = true; //firstofLHS
-		for (int i = 0; i < strlen(testCharList); i++)
-		{
-			if (testCharList[i] == '=') { RHS = false; }
+		//	bool rightHandSide = true, firstOfLHS = true;
+
+
+			//KEEP THIS CODE
+		int i = 0;
+		bool found = false;
+		while (testWord[i] != NULL) { //filter out $
+			if (testWord[i] != '$')
+				filtered += testWord[i];
+			i++;
 		}
 
-		if (!RHS)
-		{
-			for (int i = 0; i < strlen(testCharList); i++)
-			{
-				for (int j = 0; j < 5; j++) {
-					if (testCharList[i] == operators[j]) {firstOfLHS = false;}
-				}
+		//find if testWord already exists in idList
+		i = 0;
+		while (!found && i < idList.size()) {
+			if (idList.at(i) == filtered) {
+				found = true;
 			}
-			if (firstOfLHS){ myfile << "<Expression> -> <Term> <Expression Prime>\n"; }
+			i++;
+		}
+		if (!found) {//if it doesn't exist in the list, add it
+			if (prevType == "")
+				error("No declaration given");
+			idList.push_back(filtered);
+			memoryList.push_back(Memory_Address);
+			Memory_Address++;
+			typesList.push_back(prevType);
+		}
 
-			myfile << "<Term> -> <Factor><TermPrime>\n";
-			myfile << "<Factor> -> <Identifier>\n";
+
+		if (prevVar == "") {
+			prevVar = testWord;
 		}
-		else
-		{
-			myfile << "<Statement> -> <Assign>\n";
-			myfile << "<Assign> -> <Identifier> = <Expression>\n";
+		else if (nextVar == "") {
+			nextVar = testWord;
 		}
-		return a;
+
+		//adds id to equation
+		i = 0;
+		while (!isblank(testWord[i]) && i < 23) {
+			equation[iteration][i] = testWord[i];
+			i++;
+		}
+		iteration++;
+
+		return str;
 	}
 
 	string Separators() { //Separators - syntaxSep
-		string phrase = " <Separator> -> ";
+		string s = " ";
 
 		char openers[5] = { "([{'" }, closers[] = { ")]}'" }; //Contain the opening and closing separators in their own character arrays
-		for (int a = 0; a < 4; a++) { //Will iterate through all the elements in both arrays
-			if (testChar == openers[a] && theStack[stackindex] != openers[a]) {//know testChar is a closing separator
-				stackindex++;
-				theStack[stackindex] = testChar;//add separator to the stack
-
-				if (testChar == '(') {
-					phrase += " <Condition>\n";
-					phrase += " <Condition> -> <StatementList>";
-				}
-				else {
-					phrase += " <OpeningSeparator> <StatementList>\n";
-					phrase += " <OpeningSeparator> -> " + testChar;
-				}
-				return phrase;
-			}
-			else if (testChar == closers[a]) {//know testChar is a closing separator
-				if (openers[a] == theStack[stackindex]) {
-
-					theStack[stackindex] = ' ';
-					stackindex--;
-					if (testChar == ')') {
-						phrase += " <Condition>\n";
-						phrase += " <Condition> -> <StatementList> )";
-						phrase += "\n <StatementList> -> Epsilon";
-					}
-					else {
-						phrase += " <StatementList> <ClosingSeparator>\n";
-						phrase += " <ClosingSeparator> -> " + testChar;
-					}
-					return phrase;
-				}
-			}
-		}
-		phrase += " <EndSeparator>\n";
-		return phrase;
+		
+		return s;
 	}
 
 	string Keywords() { //Keywords - syntaxKey
-		string phrase;
+		string str;
 
 		char parenthesisWords[10][10] = { "if", "while", "for", "forend","function", "main" }; //Keywords that have parenthesis next to them
-		for (int i = 0; i < 7; i++) {
-			if (strcmp(testWord, parenthesisWords[i]) == 0)
+		
+		for (int z = 0; z < 7; z++) {
+			if (strcmp(testWord, parenthesisWords[z]) == 0)
 				status = true;
 		}
 
-		for (int i = 0; i < 20; i++) {
-			if (strcmp(testWord, keywords[i]) == 0) { //Compare the currently read in word to the keywords array
-				string key = (string)keywords[i]; //Typecast the current index in keywords array as a string and set it to key 
+		char importantKeys[6][10] = { "int", "bool", "float", "double", "char", "boolean" };
+		for (int z = 0; z < 6; z++) {
+			if (strcmp(testWord, importantKeys[z]) == 0)
+				prevType = testWord;
+		}
 
-				if (i < 3) { //is a variable
-					phrase += " <KeyWord> -> <Variable>\n";
-					phrase += " <Variable> -> <" + key + ">";
-				}
-				else if (i > 2 && i < 13) {//is a conditional
-					phrase += " <KeyWord> -> <Conditional>\n";
-					phrase += " <Conditional> -> <" + key + "> + <Separator>";
-				}
-				else {//is a function
-					phrase += " <KeyWord> -> <Function>\n";
-					phrase += " <Function> -> <" + key + ">";
-				}
+		for (int a = 0; a < 20; a++) {
+			if (strcmp(testWord, keywords[a]) == 0) {
+				string key = (string)keywords[a];
 			}
 		}
-		return phrase;
+
+		return str;
 	}
 
 	string numbers() { //Numbers - syntaxNum
-		string num;
-		num = " <Number> -> <Assign>";
-		num = " <Assign> -> <" + (string)testWord + ">";
-		return num;
+		delay = "";
+		for (int i = 0; i < 23; i++) {
+			equation[iteration][i] = testWord[i];
+		}
+		iteration++;
+		return "";
 	}
 
 	string operators() { //Operators - syntaxOp
-		string ops;
+		string s;
+
+		lastOp = testChar;
+
+		bool foundFirst = false;
+		bool foundSecond = false;
+
+		//only if operator is an = sign then delay must occur
+		if (testChar == '=') {
+
+			delay = "POPM";
+			isEquation = true;
+		}
+		else {//all other operators
+			for (int i = 0; i < idList.size(); i++) {
+				if (!foundFirst && idList.at(i) == prevVar) {
+					assemble("PUSHM", (5000 + i));
+					foundFirst = true;
+				}
+			}
+		}
+
+		equation[iteration][0] = testChar;
+		iteration++;
+
+		return s;
+	}
+
+	int getAddr(string id) {
+		for (int i = 0; i < idList.size(); i++) {
+			if (id == idList.at(i))
+				return memoryList.at(i);
+		}
+	}
+
+	bool isNumber(const std::string& s)
+	{
+		std::string::const_iterator it = s.begin();
+		while (it != s.end() && isdigit(*it)) ++it;
+		return !s.empty() && it == s.end();
+	}
+
+	void getInstruction(string str) {
+		if (isNumber(str)) {
+			int val = 0;
+			stringstream num(str);
+			num >> val;
+		}
+
 		if (testChar == '*') {
-			myfile << " <TermPrime> -> * <Factor> <TermPrime>\n";
-			myfile << " <ExpressionPrime> -> <Empty>\n";
+
+			assemble("MULT");
 		}
 		else if (testChar == '/') {
-			myfile << " <TermPrime> -> / <Factor> <TermPrime>\n";
-			myfile << " <ExpressionPrime> -> <Empty>\n";
+			assemble("DIV");
 		}
 		else if (testChar == '+') {
-			myfile << " <TermPrime> -> <Empty>\n";
-			myfile << " <ExpressionPrime> -> + <Term> <ExpressionPrime>\n";
+			assemble("ADD");
 		}
 		else if (testChar == '-') {
-			myfile << " <TermPrime> -> <Empty>\n";
-			myfile << " <ExpressionPrime> -> - <Term> <ExpressionPrime>\n";
+			assemble("SUB");
 		}
-		myfile << " <Empty>->Epsilon\n";
-
-		return ops;
+		else if (str == "=") {
+			//skip
+		}
+		else if (isNumber(str)) {
+			int val = 0;
+			stringstream num(str);
+			num >> val;
+			assemble("PUSHI", val);
+		}
+		else {//is an id
+			assemble("PUSHM", getAddr(str));
+		}
 	}
 
 	//***********LEXICAL ANALYZER CODE*********************//

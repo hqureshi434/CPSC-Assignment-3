@@ -126,6 +126,7 @@
     <Text Include="Input.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="mainTwo.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,10 @@
+*******Syntax Analyzer*******
+
+Token: String		Lexeme: int
+ 
+Token: String		Lexeme: a
+ 
+Token: String		Lexeme: =
+ 
+Token: String		Lexeme: 3;
+ 
