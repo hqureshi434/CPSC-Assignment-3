@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Analysis.h" />
     <ClInclude Include="SymbolGenerator.h" />
+    <ClInclude Include="tempWorkingFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

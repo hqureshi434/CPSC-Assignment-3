@@ -86,7 +86,7 @@ public:
 	Analysis() {}; //Default Contructor
 
 	Analysis(string filename, string outputFile) {
-		//Variables
+		//Old Variables
 		lexeme tool;
 		int countWord = 0;
 		char currentChar = ' ';
@@ -95,6 +95,10 @@ public:
 		int prevState = Ignore;
 		string currentWord = "";
 
+		//New Varialbles
+		bool print = false, printline = false, test = false;
+		char operators[] = "+-*/%=", separators[] = "'(){}[],.:;!";
+		int i;
 
 		//File objects
 		fstream file(filename, ios::in); //This will read in the file
@@ -143,7 +147,7 @@ public:
 						}
 						else if(compareWord.compare("Operator") == 0) //If the lexer identifies a token as an operator then use the oparators function
 						{
-							fileWriter << operators();
+							fileWriter << Operators();
 						}
 						else if(compareWord.compare("Space") != 0) //If the lexer identifies a token as a Space then use the separators function
 						{
@@ -375,7 +379,7 @@ public:
 		return "";
 	}
 
-	string operators() { //Operators - syntaxOp
+	string Operators() { //Operators - syntaxOp
 		string s;
 
 		lastOp = testChar;

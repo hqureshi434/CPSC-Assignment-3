@@ -32,5 +32,8 @@
     <ClInclude Include="SymbolGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tempWorkingFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
