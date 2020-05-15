@@ -140,8 +140,9 @@ public:
 			}
 			lexer(j);
 		}
-		if (stackindex != 0)
+		if (stackindex != 0) {
 			error("Closing argument not found");
+		}
 
 		file.close();
 		myfile.close();
@@ -604,95 +605,4 @@ public:
 			break;
 		}
 	}
-
-	//Analysis() {}; //Default Contructor
-
-	//Analysis(string filename, string outputFile) {
-	//	//Old Variables
-	//	lexeme tool;
-	//	int countWord = 0;
-	//	char currentChar = ' ';
-	//	int col = Ignore;
-	//	int currentState = Ignore;
-	//	int prevState = Ignore;
-	//	string currentWord = "";
-
-	//	//New Varialbles
-	//	bool print = false, printline = false, test = false;
-	//	char operators[] = "+-*/%=", separators[] = "'(){}[],.:;!";
-	//	int i;
-
-	//	//File objects
-	//	fstream file(filename, ios::in); //This will read in the file
-	//	ofstream fileWriter; //Created so we can write the output to a separate file
-
-	//	fileWriter.open(outputFile); //This will create a new file to write the output to
-	//	fileWriter << "*******Syntax Analyzer*******\n";
-
-	//	if (!file.is_open()) {
-	//		cout << "Cannot open file";
-	//	}
-	//	else {
-	//		while (!file.eof()) {
-
-	//			file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
-	//									 into the struct lexeme under the variable*/
-	//			file >> ws;
-	//			fileWriter << "\n";
-
-	//			currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
-
-	//			for (size_t i = 0; i < currentWord.length(); i++) {
-	//				currentChar = currentWord[i]; //Grab each character from the word that came from the array
-	//				col = getCharState(currentChar); //This will return the transition type for the current character
-
-	//				currentState = stateTable[currentState][col]; //Get the current state from the current word
-
-	//				if (currentState != Ignore) {
-	//					tool.token = currentWord;
-
-	//					if (prevState == Ignore) {
-	//						tool.lexNumber = currentState;
-	//					}
-	//					else {
-	//						tool.lexNumber = prevState;
-	//					}
-
-	//					tool.lex = lexName(tool.lexNumber);
-	//					fileWriter << "Token: " <<  tool.lex  << "		" << "Lexeme: " << tool.token  << "\n"; //Write the results to the text file
-	//					string compareWord = tool.lex;
-
-	//					//Have a series of if statements that compares currentWord.
-	//					if(compareWord.compare("String") == 0) //If the lexer identifies a token as a String then use the separators function
-	//					{
-	//						fileWriter << Separators();
-	//					}
-	//					else if(compareWord.compare("Operator") == 0) //If the lexer identifies a token as an operator then use the oparators function
-	//					{
-	//						fileWriter << Operators();
-	//					}
-	//					else if(compareWord.compare("Space") != 0) //If the lexer identifies a token as a Space then use the separators function
-	//					{
-	//						compareWord = Separators();
-	//						fileWriter << compareWord;
-	//					}
-	//					else if(compareWord.compare("Integer") != 0) //If the lexer identifies a token as an integer then use the numbers function
-	//					{ 
-	//						compareWord = numbers();
-	//						fileWriter << compareWord;
-	//					}
-	//					currentWord = "";
-	//				}
-	//				else {
-	//					currentWord += currentChar;
-	//					i++;
-	//				}
-	//				prevState = currentState;
-	//			}
-	//			countWord++;
-	//		}
-	//	}
-	//	fileWriter.close();
-	//	file.close();
-	//}
 };
