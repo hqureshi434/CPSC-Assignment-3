@@ -57,6 +57,7 @@ private:
 	int countWord; //Acts as the index for the lexArr array
 
 	//For Syntax Analyzer
+	int flag = 0;
 	int stackindex = 0;
 	int lineNumber = 1;
 	char testChar = ' ';
@@ -83,96 +84,6 @@ private:
 	bool isEquation = false;
 
 public:
-	Analysis() {}; //Default Contructor
-
-	Analysis(string filename, string outputFile) {
-		//Old Variables
-		lexeme tool;
-		int countWord = 0;
-		char currentChar = ' ';
-		int col = Ignore;
-		int currentState = Ignore;
-		int prevState = Ignore;
-		string currentWord = "";
-
-		//New Varialbles
-		bool print = false, printline = false, test = false;
-		char operators[] = "+-*/%=", separators[] = "'(){}[],.:;!";
-		int i;
-
-		//File objects
-		fstream file(filename, ios::in); //This will read in the file
-		ofstream fileWriter; //Created so we can write the output to a separate file
-
-		fileWriter.open(outputFile); //This will create a new file to write the output to
-		fileWriter << "*******Syntax Analyzer*******\n";
-
-		if (!file.is_open()) {
-			cout << "Cannot open file";
-		}
-		else {
-			while (!file.eof()) {
-
-				file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
-										 into the struct lexeme under the variable*/
-				file >> ws;
-				fileWriter << "\n";
-
-				currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
-
-				for (size_t i = 0; i < currentWord.length(); i++) {
-					currentChar = currentWord[i]; //Grab each character from the word that came from the array
-					col = getCharState(currentChar); //This will return the transition type for the current character
-
-					currentState = stateTable[currentState][col]; //Get the current state from the current word
-
-					if (currentState != Ignore) {
-						tool.token = currentWord;
-
-						if (prevState == Ignore) {
-							tool.lexNumber = currentState;
-						}
-						else {
-							tool.lexNumber = prevState;
-						}
-
-						tool.lex = lexName(tool.lexNumber);
-						fileWriter << "Token: " <<  tool.lex  << "		" << "Lexeme: " << tool.token  << "\n"; //Write the results to the text file
-						string compareWord = tool.lex;
-
-						//Have a series of if statements that compares currentWord.
-						if(compareWord.compare("String") == 0) //If the lexer identifies a token as a String then use the separators function
-						{
-							fileWriter << Separators();
-						}
-						else if(compareWord.compare("Operator") == 0) //If the lexer identifies a token as an operator then use the oparators function
-						{
-							fileWriter << Operators();
-						}
-						else if(compareWord.compare("Space") != 0) //If the lexer identifies a token as a Space then use the separators function
-						{
-							compareWord = Separators();
-							fileWriter << compareWord;
-						}
-						else if(compareWord.compare("Integer") != 0) //If the lexer identifies a token as an integer then use the numbers function
-						{ 
-							compareWord = numbers();
-							fileWriter << compareWord;
-						}
-						currentWord = "";
-					}
-					else {
-						currentWord += currentChar;
-						i++;
-					}
-					prevState = currentState;
-				}
-				countWord++;
-			}
-		}
-		fileWriter.close();
-		file.close();
-	}
 
 	void error(string str)
 	{
@@ -184,10 +95,64 @@ public:
 		exit(0);
 	}
 
+	//***********Main Code**********************//
+	Analysis() {}; //Default Contructor
+	Analysis(string outfileName) { //Takes in the name of the output file
+		myfile.open(outfileName);  
+		myfile << "            Output" << endl;
+		myfile << "----------------------------------------------------" << endl;
+
+		if (!file.is_open()) {
+			myfile << "Exited";
+			exit(0);
+		}
+
+		int i = 0, j = 0;
+		while (!file.eof())
+		{
+			testChar = file.get();
+			testCharList[i] = testChar;
+			i++;
+			if (testChar == '\n')
+			{
+				prevType = "";
+				prevVar = "";
+				nextVar = "";
+				lineNumber++;
+				for (int i = 0; i < 20; i++)
+					testCharList[i] = '\0';
+				i = 0;
+
+
+				if (isEquation) {
+					for (int x = iteration - 1; x > 0; x--) {
+						getInstruction((string)equation[x]);
+					}
+					Assembly("POPM", getAddr(equation[0]));
+				}
+
+				//reset equation values
+				for (int z = 0; z < iteration; z++) {
+					memset(equation[iteration], 0, sizeof(equation[iteration]));
+				}
+				iteration = 0;
+				isEquation = false;
+			}
+			lexer(j);
+		}
+		if (stackindex != 0)
+			error("Closing argument not found");
+
+		file.close();
+		myfile.close();
+
+		symbolTable();
+	}
+
 	//***********SYMBOL TABLE CODE**********************//
 	/*for instructions that require an input for
 	integer value or memory location*/
-	void assemble(string assemblyIns, int val) {
+	void Assembly(string assemblyIns, int val) {
 		myfile << instructionLine;
 		if (assemblyIns == "PUSHI") {
 			myfile << "	PUSHI	";
@@ -211,9 +176,8 @@ public:
 		myfile << val << endl;
 	}
 
-
 	//for instructions that require no input
-	void assemble(string assemblyIns) {
+	void Assembly(string assemblyIns) {
 		myfile << instructionLine;
 		if (assemblyIns == "STDOUT") {
 			myfile << "	STDOUT";
@@ -263,9 +227,9 @@ public:
 
 	void symbolTable()
 	{
-		myfile << "\n\n\t\tSYMBOL TABLE\nIdentifier\tMemoryLocation\tType\n";
+		myfile << "\n\n\t\tSymbol Table\nIdentifier\tMemoryLocation\tType\n";
 
-		for (int i = 0; i < idList.size(); i++) {
+		for (size_t i = 0; i < idList.size(); i++) {
 			myfile << idList.at(i) << "\t\t" << memoryList.at(i) << "\t\t" << typesList.at(i) << endl;
 		}
 		myfile << endl << endl;
@@ -273,6 +237,124 @@ public:
 
 	//------------------------------------------------------------------------------------------------------------
 
+	void lexer(int& j) {
+		bool print = false, printline = false, test = false;
+		char operators[] = "+-*/%=", separators[] = "'(){}[],.:;!";
+		int i;
+
+		//discard all spaces
+		while (testChar == ' ')
+			testChar = file.get();
+
+		//check if comment
+		if (testChar == '!') {
+			testChar = file.get();
+			while (testChar != '!') {
+				testChar = file.get();
+			}
+			return;
+		}
+
+		//Check operator
+		for (i = 0; i < 6; ++i)
+		{
+			if (testChar == operators[i]) {
+				//cout << testChar << " is operator\n";
+				Operators();
+				flag = 1;
+				return;
+			}
+		}
+
+		//Check seprator
+		for (int m = 0; m < 11; m++)
+		{
+			if (testChar == separators[m]) {
+				//cout << testChar << " is separator\n";
+				Separators();
+				flag = 1;
+				return;
+			}
+		}
+
+		//Check the char to see if it is a number
+		if (isdigit(testChar))
+		{
+			char str[5];
+			int x = 0;
+			testWord[j] = '\0';
+			j = 0;
+			str[x++] = testChar;
+
+			while (isdigit(file.peek())) {
+				testChar = file.get();
+				str[x] = testChar;
+				x++;
+			}
+
+			if (x == 0) {}
+			else {
+				for (int u = 0; u < x; u++) {
+					testWord[j] = '\0';
+				}
+			}
+			flag = 0;
+			numbers(str);
+			return;
+		}
+
+		//If the first character is not operator nor the seperator, get all the rest of word until reach space
+		if (isalnum(testChar) || testChar == '$')
+		{
+			//cout << "IS ALNUM: " << testChar << "\tj = " << j << endl;
+			bool stop = false;
+			char next;
+			if (testChar == ' ' || testChar == '\n')
+				stop = true;
+			while (!stop) {
+				testWord[j++] = testChar;
+				if (strcmp(testWord, "endif$") == 0)//competes program @ endif statement
+				{
+					file.close();
+					myfile.close();
+					symbolTable();
+					exit(EXIT_SUCCESS);
+					return;
+				}
+				next = file.peek();
+				for (i = 0; i < 11; ++i)
+				{
+					if (next == separators[i]) {
+						stop = true;
+					}
+				}
+				for (i = 0; i < 6; ++i)
+				{
+					if (next == operators[i]) {
+						stop = true;
+					}
+				}
+				if (!stop)
+					testChar = file.get();
+				if (testChar == ' ' || testChar == '\n')
+					stop = true;
+			}
+
+			test = true;
+			//Make the rest of c string become null
+			testWord[j] = '\0';
+			//reset new index of testWord for next testWord
+			j = 0;
+
+			if (isKeyword(testWord)) {
+				myfile << Keywords();
+			}
+			else {
+				myfile << Identifiers();
+			}
+			flag = 0;
+		}
+	}
 
 	//***********SYNTAX ANALYZER CODE**********************//
 	//Does a comparison with character to the keyword array to see if there is a keyword
@@ -289,11 +371,8 @@ public:
 	string Identifiers() { //Identifiers - syntaxID
 		string str, filtered;
 		char operators[] = "+-*/%";
-		//	bool rightHandSide = true, firstOfLHS = true;
 
-
-			//KEEP THIS CODE
-		int i = 0;
+		size_t i = 0;
 		bool found = false;
 		while (testWord[i] != NULL) { //filter out $
 			if (testWord[i] != '$')
@@ -370,7 +449,7 @@ public:
 		return str;
 	}
 
-	string numbers() { //Numbers - syntaxNum
+	string numbers(char s[]) { //Numbers - syntaxNum
 		delay = "";
 		for (int i = 0; i < 23; i++) {
 			equation[iteration][i] = testWord[i];
@@ -394,9 +473,9 @@ public:
 			isEquation = true;
 		}
 		else {//all other operators
-			for (int i = 0; i < idList.size(); i++) {
+			for (size_t i = 0; i < idList.size(); i++) {
 				if (!foundFirst && idList.at(i) == prevVar) {
-					assemble("PUSHM", (5000 + i));
+					Assembly("PUSHM", (5000 + i));
 					foundFirst = true;
 				}
 			}
@@ -409,7 +488,7 @@ public:
 	}
 
 	int getAddr(string id) {
-		for (int i = 0; i < idList.size(); i++) {
+		for (size_t i = 0; i < idList.size(); i++) {
 			if (id == idList.at(i))
 				return memoryList.at(i);
 		}
@@ -431,16 +510,16 @@ public:
 
 		if (testChar == '*') {
 
-			assemble("MULT");
+			Assembly("MULT");
 		}
 		else if (testChar == '/') {
-			assemble("DIV");
+			Assembly("DIV");
 		}
 		else if (testChar == '+') {
-			assemble("ADD");
+			Assembly("ADD");
 		}
 		else if (testChar == '-') {
-			assemble("SUB");
+			Assembly("SUB");
 		}
 		else if (str == "=") {
 			//skip
@@ -449,13 +528,15 @@ public:
 			int val = 0;
 			stringstream num(str);
 			num >> val;
-			assemble("PUSHI", val);
+			Assembly("PUSHI", val);
 		}
 		else {//is an id
-			assemble("PUSHM", getAddr(str));
+			Assembly("PUSHM", getAddr(str));
 		}
 	}
 
+
+	//-------------------OLD CODE--------------------------//
 	//***********LEXICAL ANALYZER CODE*********************//
 	//Notes: Group Keywords and Identifiers as strings in one loop then in a nested loop do a comparision with the strings to determine if they are
 	//keywords with the array. If there are any strings left that are not keywords then they will be labeled as idenitifiers.
@@ -523,4 +604,95 @@ public:
 			break;
 		}
 	}
+
+	//Analysis() {}; //Default Contructor
+
+	//Analysis(string filename, string outputFile) {
+	//	//Old Variables
+	//	lexeme tool;
+	//	int countWord = 0;
+	//	char currentChar = ' ';
+	//	int col = Ignore;
+	//	int currentState = Ignore;
+	//	int prevState = Ignore;
+	//	string currentWord = "";
+
+	//	//New Varialbles
+	//	bool print = false, printline = false, test = false;
+	//	char operators[] = "+-*/%=", separators[] = "'(){}[],.:;!";
+	//	int i;
+
+	//	//File objects
+	//	fstream file(filename, ios::in); //This will read in the file
+	//	ofstream fileWriter; //Created so we can write the output to a separate file
+
+	//	fileWriter.open(outputFile); //This will create a new file to write the output to
+	//	fileWriter << "*******Syntax Analyzer*******\n";
+
+	//	if (!file.is_open()) {
+	//		cout << "Cannot open file";
+	//	}
+	//	else {
+	//		while (!file.eof()) {
+
+	//			file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
+	//									 into the struct lexeme under the variable*/
+	//			file >> ws;
+	//			fileWriter << "\n";
+
+	//			currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
+
+	//			for (size_t i = 0; i < currentWord.length(); i++) {
+	//				currentChar = currentWord[i]; //Grab each character from the word that came from the array
+	//				col = getCharState(currentChar); //This will return the transition type for the current character
+
+	//				currentState = stateTable[currentState][col]; //Get the current state from the current word
+
+	//				if (currentState != Ignore) {
+	//					tool.token = currentWord;
+
+	//					if (prevState == Ignore) {
+	//						tool.lexNumber = currentState;
+	//					}
+	//					else {
+	//						tool.lexNumber = prevState;
+	//					}
+
+	//					tool.lex = lexName(tool.lexNumber);
+	//					fileWriter << "Token: " <<  tool.lex  << "		" << "Lexeme: " << tool.token  << "\n"; //Write the results to the text file
+	//					string compareWord = tool.lex;
+
+	//					//Have a series of if statements that compares currentWord.
+	//					if(compareWord.compare("String") == 0) //If the lexer identifies a token as a String then use the separators function
+	//					{
+	//						fileWriter << Separators();
+	//					}
+	//					else if(compareWord.compare("Operator") == 0) //If the lexer identifies a token as an operator then use the oparators function
+	//					{
+	//						fileWriter << Operators();
+	//					}
+	//					else if(compareWord.compare("Space") != 0) //If the lexer identifies a token as a Space then use the separators function
+	//					{
+	//						compareWord = Separators();
+	//						fileWriter << compareWord;
+	//					}
+	//					else if(compareWord.compare("Integer") != 0) //If the lexer identifies a token as an integer then use the numbers function
+	//					{ 
+	//						compareWord = numbers();
+	//						fileWriter << compareWord;
+	//					}
+	//					currentWord = "";
+	//				}
+	//				else {
+	//					currentWord += currentChar;
+	//					i++;
+	//				}
+	//				prevState = currentState;
+	//			}
+	//			countWord++;
+	//		}
+	//	}
+	//	fileWriter.close();
+	//	file.close();
+	//}
 };

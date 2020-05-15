@@ -21,18 +21,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mainTwo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Analysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SymbolGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tempWorkingFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

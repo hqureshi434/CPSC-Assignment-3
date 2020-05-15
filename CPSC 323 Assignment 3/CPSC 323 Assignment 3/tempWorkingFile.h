@@ -60,7 +60,7 @@ class Analysis {
 		exit(EXIT_FAILURE);
 	}
 
-	void assemble(string instruction, int value) {
+	void Assembly(string instruction, int value) {
 	myfile << instructionLine;
 	if (instruction == "PUSHI")
 		myfile << "\tPUSHI\t";
@@ -79,7 +79,7 @@ class Analysis {
 }
 
 //for instructions that require no input
-void assemble(string instruction) {
+void Assembly(string instruction) {
 	myfile << instructionLine;
 	if (instruction == "STDOUT")
 		myfile << "\tSTDOUT";
@@ -208,7 +208,7 @@ string analyzeOp() {
 
 		for (int i = 0; i < idList.size(); i++) {
 			if (!foundFirst && idList.at(i) == prevVar) {
-				assemble("PUSHM", (5000 + i));
+				Assembly("PUSHM", (5000 + i));
 				foundFirst = true;
 			}
 		}
@@ -298,16 +298,16 @@ void getInstruction(string str) {
 
 	if (testChar == '*') {
 
-		assemble("MULT");
+		Assembly("MULT");
 	}
 	else if (testChar == '/') {
-		assemble("DIV");
+		Assembly("DIV");
 	}
 	else if (testChar == '+') {
-		assemble("ADD");
+		Assembly("ADD");
 	}
 	else if (testChar == '-') {
-		assemble("SUB");
+		Assembly("SUB");
 	}
 	else if (str == "=") {
 		//skip
@@ -316,10 +316,10 @@ void getInstruction(string str) {
 		int val = 0;
 		stringstream num(str);
 		num >> val;
-		assemble("PUSHI", val);
+		Assembly("PUSHI", val);
 	}
 	else {//is an id
-		assemble("PUSHM", getAddr(str));
+		Assembly("PUSHM", getAddr(str));
 	}
 }
 
@@ -536,7 +536,7 @@ public:
 						for (int x = iteration - 1; x > 0; x--) {
 							getInstruction((string)equation[x]);
 						}
-						assemble("POPM", getAddr(equation[0]));
+						Assembly("POPM", getAddr(equation[0]));
 					}
 
 					for (int z = 0; z < iteration; z++) {

@@ -10,7 +10,11 @@ using namespace std;
 
 int main()
 {
-    Analysis lexicalAnalysis = Analysis("Input.txt", "Result.txt");
+	//---------OLD CODE--------------------------------------------
+     //Analysis lexicalAnalysis = Analysis("Input.txt", "Result.txt");
+	//-------------------------------------------------------------
+
+    Analysis symbolAnalysis = Analysis("Output.txt");
 
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "SymbolGenerator.h"
+/*#include "SymbolGenerator.h"
 
 int main() {
 
@@ -55,4 +55,4 @@ int main() {
 	symbolTable();
 
 	return 0;
-}
+}*/
